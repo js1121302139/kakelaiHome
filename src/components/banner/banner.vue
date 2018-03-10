@@ -1,63 +1,123 @@
 <template>
-  <div class="Banner">
+  <div class="Banner" ref="banner" @mouseover="hoverImg()" @mouseout="outImg()" :style="`height:${height}px;`">
     <div class="bannerContainer" ref="container">
       <div class="bannerImg" :key="item" v-for="item in bannerImg">
         <img :key="item" :style="'width:'+windowWidth+'px'" :src="item" alt="">
       </div>
     </div>
-    <div class="bannerNum">
-      <span :key="item" @click="nextImg(key)" v-for="(item, key) in bannerImg"></span>
+    <div class="bannerNum" v-if="isShowNum">
+      <span :key="item" :class="{active : nowImgIndex==key}" @click.stop="nextImg(key)"
+            v-for="(item, key) in bannerImg"></span>
     </div>
-    {{transform}}
   </div>
 </template>
 
 <script>
   export default {
     name: '',
+    props: {
+      bannerImg: {
+        type: Array
+      },
+      isShowNext: {
+        type: Boolean,
+        default: true
+      },
+      isShowNum: {
+        type: Boolean,
+        default: true
+      },
+      height: {
+        type: Number,
+        default: 600
+      },
+      eventName: {
+        type: String,
+        default: 'next'
+      },
+      nextIndex: {
+        type: Number
+      }
+    },
     data () {
       return {
         windowWidth: 0,
-        bannerImg: ['http://pic29.photophoto.cn/20131204/0034034499213463_b.jpg', 'http://pic29.nipic.com/20130514/12477194_083818249176_2.jpg'],
-        isShowNext: true,
-        isShowNum: true,
         containerWidth: 0,
         nowImgIndex: 0,
         bannerNum: 0,
-        transform: 0
-      };
+        transform: 0,
+        timer: ''
+      }
     },
     created () {
-      this.bannerNum = this.bannerImg.length;
-      this.windowWidth = window.innerWidth;
-      this.containerWidth = this.windowWidth * this.bannerNum;
+      this.bannerNum = this.bannerImg.length
+      this.containerWidth = this.windowWidth * this.bannerNum
     },
     methods: {
+      hoverImg () {
+        clearInterval(this.timer)
+      },
+      outImg () {
+        this.init()
+      },
+      setTransform () {
+        this.$refs.container && this.$refs.container.setAttribute('style', `width:${this.containerWidth}px; transform: translate3d(${this.transform}px,0,0);`)
+      },
+      init () {
+        this.timer = setInterval(() => {
+          this.nowImgIndex++
+          if (this.nowImgIndex >= this.bannerNum) {
+            this.nowImgIndex = 0
+            this.transform = this.windowWidth * this.nowImgIndex
+          } else {
+            this.transform = this.windowWidth * -this.nowImgIndex
+          }
+          this.setTransform()
+          this.$emit(this.eventName, this.nowImgIndex)
+        }, 2000)
+      },
       nextImg (key) {
-        this.nowImgIndex = key - this.bannerNum <= 0 ? 0 : key - this.bannerNum;
-        this.transform = this.nowImgIndex * this.containerWidth;
-        this.$refs.container.setAttribute('style', `width:${this.containerWidth}px;transform: translate3d(${this.transform}px,0,0);`);
+        if (key > this.nowImgIndex || this.transform) {
+          this.transform = this.windowWidth * -key
+        } else {
+          this.transform = this.windowWidth * key
+        }
+        this.nowImgIndex = key
+        this.setTransform()
+        this.$emit('add', this.nowImgIndex)
+      }
+    },
+    mounted () {
+      this.windowWidth = this.$refs.banner.clientWidth
+      this.init()
+      this.setTransform()
+    },
+    watch: {
+      nextIndex: function (val) {
+        if (val < this.bannerNum && val >= 0) {
+          this.nextImg(val)
+          clearInterval(this.timer)
+        }
       }
     }
-  };
+  }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="less">
+<style lang="less" scoped>
   .Banner {
     position: relative;
     overflow: hidden;
     display: flex;
-    height: 50px;
     .bannerContainer {
       position: relative;
       display: flex;
       flex: 1;
-      transition: all 0.25s;
+      transition: all 1s ease-out;
       .bannerImg {
         flex: 1;
         width: 100%;
-        height: 50px;
+        height: 100%;
         background: #f00;
         img {
           display: block;
@@ -72,14 +132,18 @@
       display: flex;
       flex: 1;
       width: 100%;
-      bottom: 10px;
+      bottom: 22px;
       justify-content: center;
       span {
         display: inline-block;
-        width: 10px;
-        height: 2px;
-        margin-right: 10px;
-        background: #f00;
+        width: 44px;
+        height: 4px;
+        margin-right: 12px;
+        background: #8d8b89;
+        transition: all 0.5s;
+      }
+      .active {
+        background: #fff;
       }
     }
   }
