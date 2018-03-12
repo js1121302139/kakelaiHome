@@ -1,5 +1,5 @@
 <template>
-  <div class="clearfix" :class="{navModelMobBlack : blackNav}">
+  <div class="clearfix" :class="{navModelMobBlack : (blackNav&&mob)}">
     <div class="row navModel hidden-sm hidden-xs">
       <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
         <img class="logo" src="./img/logo.png" alt="">
@@ -32,8 +32,11 @@
              @click="change(item)"
              :class="{active : item.active}"
              :key="item.txt"
-             v-for="item in navBar">
+             v-for="item in mobNavBar">
           <router-link :to="{name:`${item.name}`}" v-text="item.txt">首页</router-link>
+        </div>
+        <div class="navsItem">
+          <a href="https://baidu.com" >App下载</a>
         </div>
       </div>
     </div>
@@ -51,6 +54,7 @@
         showFun: false,
         blackNav: '',
         showDow: false,
+        mob: false,
         navBar: [
           {
             txt: '首页',
@@ -78,12 +82,36 @@
             active: false,
             name: 'AppDow'
           }
+        ],
+        mobNavBar: [
+          {
+            txt: '首页',
+            active: true,
+            name: 'Home'
+          }, {
+            txt: '功能与服务',
+            active: false,
+            name: 'Service'
+          }, {
+            txt: '商务合作',
+            active: false,
+            name: 'Cooperation'
+          }, {
+            txt: '帮助中心',
+            active: false,
+            name: 'HelpCenter'
+          }, {
+            txt: '关于我们',
+            active: false,
+            name: 'AboutUs'
+          }
         ]
       }
     },
     created () {
+      this.mob = window.innerWidth > 750
       window.onscroll = (e) => {
-        this.blackNav = document.documentElement.scrollTop > 100;
+        this.blackNav = document.documentElement.scrollTop > 100
       }
     },
     methods: {

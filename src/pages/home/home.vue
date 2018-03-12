@@ -10,7 +10,7 @@
     ></Banner>
     <Banner
       v-if="!mob"
-      :bannerImg="topImg"
+      :bannerImg="mobTopImg"
       @add="incrementTotal"
       :isShowNext='true'
       :isShowNum='true'
@@ -153,7 +153,7 @@
         <Banner v-if="!mob"
                 @sj="sj"
                 eventName="sj"
-                :bannerImg="bottomImg"
+                :bannerImg="pcbottomImg"
                 :nextIndex="nextIndex"
                 :isShowNext='true'
                 :isShowNum='true'
@@ -161,7 +161,7 @@
         <Banner v-if="mob"
                 @dn="dn"
                 :nextIndex="nextIndex"
-                :bannerImg="bottomImg"
+                :bannerImg="mobbottomImg"
                 eventName="dn"
                 :isShowNext='true'
                 :isShowNum='false'
@@ -171,25 +171,33 @@
     <div class="row screen screen5Bg">
       <div class="screen5">
         <screenTit tit="合作品牌" subTit="20000+商户的共同选择" titColor="#000" subColor="#666"></screenTit>
-        <div class="pp">
+        <div class="pp hidden-xs hidden-sm">
           <img src="./img/pp-bg.png" alt="">
         </div>
+        <div class="pp hidden-md hidden-lg">
+          <img src="./img/mobpp.png" alt="">
+          <img src="./img/mobpp1.png" alt="">
+        </div>
+
       </div>
     </div>
     <Footer></Footer>
   </div>
 </template>
 <script>
+  import { mapGetters, mapActions, mapState } from 'vuex'
   import navBar from '../../components/navBar/navBar.vue'
   import Banner from '../../components/banner/banner.vue'
   import Footer from '../../components/footer/footer.vue'
   import screenTit from '../../components/screenTit/screenTit.vue'
-  import topBanner1 from './img/1.png'
-  import topBanner2 from './img/2.png'
-  import topBanner3 from './img/3.png'
-  import bottomBanner4 from './img/4.png'
-  import bottomBanner5 from './img/5.png'
-  import bottomBanner6 from './img/6.png'
+  import TopBanner from './img/TopBanner.png'
+  import mobTopBanner from './img/mobTopBanner.png'
+  import PcBanner1 from './img/1.png'
+  import PcBanner2 from './img/2.png'
+  import PcBanner3 from './img/3.png'
+  import mobBanner4 from './img/4.png'
+  import mobBanner5 from './img/5.png'
+  import mobBanner6 from './img/6.png'
 
   export default {
     components: {
@@ -204,14 +212,21 @@
         index: 0,
         mob: 0,
         nextIndex: 0,
-        topImg: [topBanner1, topBanner2, topBanner3],
-        bottomImg: [bottomBanner4, bottomBanner5, bottomBanner6]
+        topImg: [TopBanner],
+        mobTopImg: [mobTopBanner],
+        pcbottomImg: [mobBanner4, mobBanner5, mobBanner6],
+        mobbottomImg: [PcBanner1, PcBanner2, PcBanner3]
       }
     },
     created () {
       this.mob = window.innerWidth > 750
+      this.setWindowWidth(this.$store.state, 10000)
+      console.log(this.windowWidth + 'state')
+      console.log(this.getWindowWidth())
     },
     methods: {
+      ...mapActions(['setWindowWidth']),
+      ...mapGetters(['getWindowWidth']),
       next (type) {
         if (type === 'after') {
           this.nextIndex -= 1
@@ -230,6 +245,9 @@
         // this.nextIndex = index
 //        console.log(index + 'dn')
       }
+    },
+    computed: {
+      ...mapState(['windowWidth'])
     }
   }
 </script>
@@ -479,7 +497,7 @@
             height: 400px;
             img {
               width: 100%;
-              height: 100%;
+              height: 200px;
             }
           }
         }

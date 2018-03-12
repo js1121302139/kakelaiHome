@@ -118,7 +118,6 @@
         flex: 1;
         width: 100%;
         height: 100%;
-        background: #f00;
         img {
           display: block;
           width: 100%;
